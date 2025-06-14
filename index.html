@@ -1,73 +1,169 @@
----
-layout: home
-title: Bootstrap &middot; The world's most popular mobile-first and responsive front-end framework.
----
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Bootstrap Plugin Test Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- jQuery -->
+    <script src="vendor/jquery.min.js"></script>
+    <script>
+      // Disable jQuery event aliases to ensure we don't accidentally use any of them
+      (function () {
+        var eventAliases = [
+          'blur',
+          'focus',
+          'focusin',
+          'focusout',
+          'load',
+          'resize',
+          'scroll',
+          'unload',
+          'click',
+          'dblclick',
+          'mousedown',
+          'mouseup',
+          'mousemove',
+          'mouseover',
+          'mouseout',
+          'mouseenter',
+          'mouseleave',
+          'change',
+          'select',
+          'submit',
+          'keydown',
+          'keypress',
+          'keyup',
+          'error',
+          'contextmenu',
+          'hover',
+          'bind',
+          'unbind',
+          'delegate',
+          'undelegate'
+        ]
+        for (var i = 0; i < eventAliases.length; i++) {
+          var eventAlias = eventAliases[i]
+          $.fn[eventAlias] = function () {
+            throw new Error('Using the ".' + eventAlias + '()" method is not allowed, so that Bootstrap can be compatible with custom jQuery builds which exclude the "event aliases" module that defines said method. See https://github.com/twbs/bootstrap/blob/master/CONTRIBUTING.md#js')
+          }
+        }
+      })()
+    </script>
 
-<main class="bs-docs-masthead" id="content" tabindex="-1">
-  <div class="container">
-    <span class="bs-docs-booticon bs-docs-booticon-lg bs-docs-booticon-outline">B</span>
-    <p class="lead">Bootstrap is the most popular HTML, CSS, and JS framework for developing responsive, mobile first projects on the web.</p>
-    <p class="lead">
-      <a href="getting-started#download" class="btn btn-outline-inverse btn-lg" onclick="ga('send', 'event', 'Jumbotron actions', 'Download', 'Download {{ site.current_version }}');">Download Bootstrap</a>
-    </p>
-    <p class="version">Currently v{{ site.current_version }}</p>
-    {% include ads.html %}
-  </div>
-</main>
+    <!-- QUnit -->
+    <link rel="stylesheet" href="vendor/qunit.css" media="screen">
+    <script src="vendor/qunit.js"></script>
+    <script>
+      // See https://github.com/axemclion/grunt-saucelabs#test-result-details-with-qunit
+      var log = []
+      // Require assert.expect in each test
+      QUnit.config.requireExpects = true
+      QUnit.done(function (testResults) {
+        var tests = []
+        for (var i = 0, len = log.length; i < len; i++) {
+          var details = log[i]
+          tests.push({
+            name: details.name,
+            result: details.result,
+            expected: details.expected,
+            actual: details.actual,
+            source: details.source
+          })
+        }
+        testResults.tests = tests
 
-<div class="bs-docs-featurette">
-  <div class="container">
-    <h2 class="bs-docs-featurette-title">Designed for everyone, everywhere.</h2>
-    <p class="lead">Bootstrap makes front-end web development faster and easier. It's made for folks of all skill levels, devices of all shapes, and projects of all sizes.</p>
+        window.global_test_results = testResults
+      })
 
-    <hr class="half-rule">
+      QUnit.testStart(function (testDetails) {
+        $(window).scrollTop(0)
+        QUnit.log(function (details) {
+          if (!details.result) {
+            details.name = testDetails.name
+            log.push(details)
+          }
+        })
+      })
 
-    <div class="row">
-      <div class="col-sm-4">
-        <img src="assets/img/sass-less.png" alt="Sass and Less support" class="img-responsive">
-        <h3>Preprocessors</h3>
-        <p>Bootstrap ships with vanilla CSS, but its source code utilizes the two most popular CSS preprocessors, <a href="../css/#less">Less</a> and <a href="../css/#sass">Sass</a>. Quickly get started with precompiled CSS or build on the source.</p>
-      </div>
-      <div class="col-sm-4">
-        <img src="assets/img/devices.png" alt="Responsive across devices" class="img-responsive">
-        <h3>One framework, every device.</h3>
-        <p>Bootstrap easily and efficiently scales your websites and applications with a single code base, from phones to tablets to desktops with CSS media queries.</p>
-      </div>
-      <div class="col-sm-4">
-        <img src="assets/img/components.png" alt="Components" class="img-responsive">
-        <h3>Full of features</h3>
-        <p>With Bootstrap, you get extensive and beautiful documentation for common HTML elements, dozens of custom HTML and CSS components, and awesome jQuery plugins.</p>
-      </div>
+      // Cleanup
+      QUnit.testDone(function () {
+        $('#qunit-fixture').empty()
+        $('#modal-test, .modal-backdrop').remove()
+      })
+
+      // Display fixture on-screen on iOS to avoid false positives
+      if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        QUnit.begin(function() {
+          $('#qunit-fixture').css({ top: 0, left: 0 })
+        })
+
+        QUnit.done(function () {
+          $('#qunit-fixture').css({ top: '', left: '' })
+        })
+      }
+
+      // Disable deprecated global QUnit method aliases in preparation for QUnit v2
+      (function () {
+        var methodNames = [
+          'async',
+          'asyncTest',
+          'deepEqual',
+          'equal',
+          'expect',
+          'module',
+          'notDeepEqual',
+          'notEqual',
+          'notPropEqual',
+          'notStrictEqual',
+          'ok',
+          'propEqual',
+          'push',
+          'start',
+          'stop',
+          'strictEqual',
+          'test',
+          'throws'
+        ];
+        for (var i = 0; i < methodNames.length; i++) {
+          var methodName = methodNames[i];
+          window[methodName] = undefined;
+        }
+      })();
+    </script>
+
+    <!-- Plugin sources -->
+    <script>$.support.transition = false</script>
+    <script src="../../js/alert.js"></script>
+    <script src="../../js/button.js"></script>
+    <script src="../../js/carousel.js"></script>
+    <script src="../../js/collapse.js"></script>
+    <script src="../../js/dropdown.js"></script>
+    <script src="../../js/modal.js"></script>
+    <script src="../../js/scrollspy.js"></script>
+    <script src="../../js/tab.js"></script>
+    <script src="../../js/tooltip.js"></script>
+    <script src="../../js/popover.js"></script>
+    <script src="../../js/affix.js"></script>
+
+    <!-- Unit tests -->
+    <script src="unit/alert.js"></script>
+    <script src="unit/button.js"></script>
+    <script src="unit/carousel.js"></script>
+    <script src="unit/collapse.js"></script>
+    <script src="unit/dropdown.js"></script>
+    <script src="unit/modal.js"></script>
+    <script src="unit/scrollspy.js"></script>
+    <script src="unit/tab.js"></script>
+    <script src="unit/tooltip.js"></script>
+    <script src="unit/popover.js"></script>
+    <script src="unit/affix.js"></script>
+
+  </head>
+  <body>
+    <div id="qunit-container">
+      <div id="qunit"></div>
+      <div id="qunit-fixture"></div>
     </div>
-
-    <hr class="half-rule">
-
-    <p class="lead">Bootstrap is open source. It's hosted, developed, and maintained on GitHub.</p>
-    <a href="{{ site.repo }}" class="btn btn-outline btn-lg">View the GitHub project</a>
-  </div>
-</div>
-
-<div class="bs-docs-featurette">
-  <div class="container">
-    <h2 class="bs-docs-featurette-title">Built with Bootstrap.</h2>
-    <p class="lead">Millions of amazing sites across the web are being built with Bootstrap. Get started on your own with our growing <a href="../getting-started/#examples">collection of examples</a> or by exploring some of our favorites.</p>
-
-    <hr class="half-rule">
-
-    <div class="row bs-docs-featured-sites">
-    {% for showcase in site.data.showcase %}
-      <div class="col-xs-6 col-sm-3">
-        <a href="{{ showcase.expo_url }}" target="_blank" title="{{ showcase.name }}">
-          <img src="{{ site.baseurl }}/assets/img/expo-{{ showcase.img }}.jpg" alt="{{ showcase.name }}" class="img-responsive">
-        </a>
-      </div>
-    {% endfor %}
-    </div>
-
-    <hr class="half-rule">
-
-    <p class="lead">We showcase dozens of inspiring projects built with Bootstrap on the Bootstrap Expo.</p>
-    <a href="{{ site.expo }}" class="btn btn-outline btn-lg">Explore the Expo</a>
-  </div>
-</div>
+  </body>
+</html>
